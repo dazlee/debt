@@ -1,0 +1,15 @@
+<head>
+<link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body>
+	<h1>親兄弟明算帳</h1>
+	<span>
+		<form action="/create-sheet" accept-charset="utf-8" method="post">
+			<p>Your Name</p>
+			<input type="text" name="owner"/>
+			<p>Create a sheet</p>
+			<input type="text" name="sheet_title"/>
+			<input type="submit" value="Create!"/>
+		</form>
+	</span>
+</body>

@@ -1,0 +1,29 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+tr.index {
+
+}
+
+tr.index th{
+	min-width: 150px;
+	font-size: 15px;
+}
+
+.hide {
+	display: none;
+}
+
+tr.list-item .edit{
+	display: none;
+}
+
+tr.list-item:hover .edit{
+	display: inline-block;
+}

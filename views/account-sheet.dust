@@ -1,0 +1,149 @@
+<head>
+<link rel="stylesheet" href="/stylesheets/style.css"/>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script type="text/javascript">
+function replaceWith (form, item_list, class_name, attrs) {
+	var item = item_list.find('.' + class_name);
+	var value = item[0].innerHTML;
+
+	item.empty();
+
+	if (attrs.length) {
+		for (var i = 0; i < attrs.length; i ++) {
+			var text = attrs[i].text || '';
+			var input = $('<input>' + text + '</input>').attr(attrs[i]);
+			item.append(input);
+			item.append('<br>');
+		}
+	} else {
+		attrs.value = value;
+		var text = attrs.text || '';
+		var input = $('<input>' + text || '' + '</input>').attr(attrs);
+		item.append(input);
+	}
+}
+
+function replaceWith2 (input, item_list, class_name) {
+	var item = item_list.find('.' + class_name);
+	var input_item = input.find('.' + class_name);
+	var value = item[0].innerHTML;
+	var input_dom = input_item.find('input');
+	if(input_dom.attr('type') === 'text'){
+		console.log('text');
+		input_dom.attr({value:value});
+	}
+}
+
+function editList(index) {
+	var item_list = $('#item' + index);
+	var update_button = item_list.find('.update').removeClass('hide');
+	var form = $('<form action="/update-list-item/" accept-charset="utf-8" method="post"></form>');
+
+	replaceWith(form, item_list, 'name', {type: 'text', name: 'name'});
+	replaceWith(form, item_list, 'date', {type: 'text', name: 'date', class: 'date-picker'});
+	replaceWith(form, item_list, 'payment_type', [{type: 'radio', name: 'payment_type', value:'i_pay',  text:'I pay'},
+											{type: 'radio', name: 'payment_type', value:'pay_me', text:'Pay Me'}]);
+	replaceWith(form, item_list, 'is_paid', [{type: 'radio', name: 'is_paid', id:'edit_paid',     value:'yes', text: 'Yes'},
+									   {type: 'radio', name: 'is_paid', id:'edit_not_paid', value:'no',  text: 'No'}]);
+	replaceWith(form, item_list, 'paid_date', {type: 'text', name: 'paid_date', id:'edit_paid_date', class: 'date-picker hide'});
+	replaceWith(form, item_list, 'amount', {type: 'text', name: 'amount'});
+	replaceWith(form, item_list, 'submit', [{type: 'submit', class:'update', value:'update'},
+											{type: 'text',   class:'hide', name: 'index', value:index}]);
+
+	setEditDatePicker();
+}
+function editList2(index) {
+	var item_list = $('#item' + index);
+	var input = $('#input');
+	
+	var input_item = input.find('.action');
+	var input_dom = input_item.find('input');
+	input_dom.attr({value:index});
+
+	replaceWith2(input, item_list, 'name');
+	replaceWith2(input, item_list, 'date');
+	replaceWith2(input, item_list, 'payment_type');
+	replaceWith2(input, item_list, 'is_paid');
+	replaceWith2(input, item_list, 'paid_date');
+	replaceWith2(input, item_list, 'amount');
+	replaceWith2(input, item_list, 'submit');
+	item_list.before(input);
+	item_list.empty();
+}
+</script>
+</head>
+<body>
+	<h2>Hi {owner}, money talks </h2>
+	<h4>{title}</h4>
+		<form action="/create-list/{_id}" accept-charset="utf-8" method="post">
+		<table>
+			<tr class="index">
+				<th></th>
+				<th>Name</th>
+				<th>Date</th>
+				<th>Payment type</th>
+				<th>Paid?</th>
+				<th>Paid Date</th>
+				<th>Amount</th>
+				<th>total</th>
+			</tr>
+			<!--form action="/update-list-item/{_id}" accept-charset="utf-8" method="post"-->
+			{#owe_list}
+			<tr class="list-item" id="item{$idx}">
+				<th><button type="button" class="edit" onclick="editList2({$idx})">edit</button></th>
+				<th class="name">{name}</th>
+				<th class="date">{date.month}/{date.date}</th>
+				<th class="payment_type">
+				{@eq key="{payment_type}" value="i_pay"}
+				I pay
+				{:else}
+				Pay Me
+				{/eq}
+				</th>
+				<th class="is_paid">
+					{@eq key="{is_paid}" value="yes"}
+						Paid
+					{:else}
+						No
+					{/eq}
+				</th>
+				<th class="paid_date">{?paid_date.month}
+					{paid_date.month}/{paid_date.date}
+					{/paid_date.month}
+				</th>
+				<th class="amount">{amount}</th>
+				<th class="submit">
+				</th>
+			</tr>
+			{/owe_list}
+			<!--/form-->
+			<tr>
+				<th colspan='7'></th>
+				<th colspan='1'>
+					{total}
+				</th>
+			</tr>
+			<tr class="new" id="input">
+				
+				<th class="action"><input type="text" name="action" class="hide" value="new"/></th>
+				<th class="name"><input type="text" name="name"/></th>
+				<th class="date"><input type="text" class="date-picker" name="date"/></th>
+				<th class="payment_type">
+					<input type="radio" name="payment_type" value="i_pay">I Pay</input><br>
+				    <input type="radio" name="payment_type" value="pay_me">Pay Me</input>
+				</th>
+				<th class="is_paid">
+					<input type="radio" name="is_paid" id="paid" value="yes">Yes</input><br>
+				    <input type="radio" name="is_paid" id="not_paid" value="no">No</input>
+				</th>
+				<th class="paid_date"><input type="text" id="paid_date" class="date-picker hide" name="paid_date"/></th>
+				<th class="amount"><input type="text" name="amount"/></th>
+				<th class="submit"><input type="submit" value="Save"/></th>
+			</tr>
+		</table>
+		</form>
+		
+</body>
+<script type="text/javascript" src="/javascripts/common.js"></script>
